@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="CG.Communication.PLC.MITSUBISH.Service.FXSVCService" CodeBehind="FXSVCService.svc.cs" %>

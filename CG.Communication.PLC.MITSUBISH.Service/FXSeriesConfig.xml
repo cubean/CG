@@ -1,0 +1,494 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<FXSeries>
+  <AttributeList belong="FX2N">
+    <MapList>
+      <Map name="M" from="1536" to="3071" reName="Mp"/>
+      <Map name="M" from="8000" to="8255" reName="Ms"/>
+      <Map name="D" from="1000" to="7999" reName="Dp" />
+      <Map name="D" from="8000" to="8255" reName="De"/>
+      <Map name="C" from="200" to="255" reName="Ch" />
+    </MapList>
+    <RegisterList>
+      <Register name="S" from="0" to="999" format="10" addrFrom="0" addrTo="999" offset="0" canForce="true" comment="" >
+        <RegisterMN from="0" to="999" m="4" n="-1" isPoint="true" />
+      </Register>
+      <Register name="X" from="0" to="177" format="8" addrFrom="0" addrTo="255" offset="1024" canForce="true" comment="">
+        <RegisterMN from="0" to="177" m="4" n="-1" isPoint="true" />
+      </Register>
+      <Register name="Y" from="0" to="177" format="8" addrFrom="0" addrTo="255" offset="1280" canForce="true" comment="" >
+        <RegisterMN from="0" to="177" m="4" n="-1" isPoint="true" />
+      </Register>
+      <Register name="T" from="0" to="255" format="10" addrFrom="0" addrTo="255" offset="1536" canForce="true" comment="" >
+        <RegisterMN from="0" to="255" m="6" n="2" isPoint="false" />
+      </Register>
+      <Register name="M" from="0" to="1535" format="10" addrFrom="0" addrTo="1535" offset="2048" canForce="true" forceFrom="0" forceTo="1023" comment="" >
+        <RegisterMN from="0" to="1535" m="4" n="-1" isPoint="true" />
+      </Register>
+      <Register name="Mp" from="1536" to="3071" format="10" addrFrom="1536" addrTo="3071" offset="512" comment="" >
+        <RegisterMN from="1536" to="3071" m="4" n="-1" isPoint="true" />
+      </Register>
+      <!--普通计数器，其中0~199为16位的，200~234为32位的-->
+      <Register name="C" from="0" to="234" format="10" addrFrom="0" addrTo="234" offset="3584" canForce="true" comment="" >
+        <RegisterMN from="0" to="234" m="6" n="4" isPoint="false" />
+      </Register>
+      <!--高速计数器，全是32位的-->
+      <Register name="Ch" from="235" to="255" format="10" addrFrom="0" addrTo="20" offset="3819" canForce="true" comment="" >
+        <RegisterMN from="235" to="255" m="6" n="4" isPoint="false" offset="326" step="2" />
+      </Register>
+      <Register name="Ms" from="8000" to="8255" format="10" addrFrom="0" addrTo="255" offset="3840" canForce="true" comment="" />
+      <!--De就是D8xxx-->
+      <Register name="De" from="8000" to="8255" format="10" addrFrom="3584" addrTo="4095" offset="0" step="2" comment="" >
+        <RegisterMN from="8000" to="8255" m="6" n="0" isPoint="false" />
+      </Register>
+      <Register name="D" from="0" to="999" format="10" addrFrom="4096" addrTo="6095" offset="0" step="2" comment="" >
+        <RegisterMN from="0" to="999" m="6" n="6" isPoint="false" />
+      </Register>
+      <Register name="Dp" from="1000" to="7999" format="10" addrFrom="6096" addrTo="20095" offset="0" step="2" comment="" >
+        <RegisterMN from="1000" to="7999" m="6" n="8" isPoint="false" />
+      </Register>
+      <!--P是指针类型，在CJ为指令时姑且看成是一个寄存器-->
+      <Register name="P" from="0" to="127" format="10" addrFrom="0" addrTo="127" offset="0" step="1" comment="">
+        <RegisterMN from="0" to="127" m="8" n="0" isPoint="false" />
+      </Register>
+    </RegisterList>
+    <!--读取元件时对应的物理地址-->
+    <RegisterReadAddrList>
+      <Register name="X">
+        <ReadAddr type="0" from="128" bitmask="1" />
+      </Register>
+      <Register name="Y">
+        <ReadAddr type="0" from="160" bitmask="1" />
+        <ReadAddr type="1">
+          <Item type="0" from="160" bitmask="1" />
+          <Item type="1" from="160" bitmask="1" />
+          <Item type="2" from="160" bitmask="1" />
+          <Item type="3" from="672" bitmask="1" />
+        </ReadAddr>
+      </Register>
+      <Register name="M">
+        <ReadAddr type="0" from="256" bitmask="1" />
+        <ReadAddr type="1">
+          <Item type="0" from="256" bitmask="1" />
+          <Item type="1" from="256" bitmask="1" />
+          <Item type="2" from="256" bitmask="1" />
+          <Item type="3" from="768" bitmask="1" />
+        </ReadAddr>
+      </Register>
+      <Register name="Ms">
+        <ReadAddr type="0" from="480" bitmask="1" />
+        <ReadAddr type="1">
+          <Item type="0" from="480" bitmask="1" />
+          <Item type="1" from="480" bitmask="1" />
+          <Item type="2" from="480" bitmask="1" />
+        </ReadAddr>
+      </Register>
+      <Register name="S">
+        <ReadAddr type="0" from="0" bitmask="1" />
+        <ReadAddr type="1">
+          <Item type="0" from="0" bitmask="1" />
+          <Item type="1" from="0" bitmask="1" />
+          <Item type="2" from="0" bitmask="1" />
+        </ReadAddr>
+      </Register>
+      <Register name="T">
+        <ReadAddr type="0" from="192" bitmask="1" />
+        <ReadAddr type="1">
+          <Item type="1" from="1216" bitmask="1" />
+          <Item type="2" from="704" bitmask="1" />
+        </ReadAddr>
+        <ReadAddr type="2" from="2048" bitmask="16" />
+      </Register>
+      <Register name="C">
+        <ReadAddr type="0" from="448" bitmask="1" />
+        <ReadAddr type="1">
+          <Item type="1" from="1216" bitmask="1" />
+          <Item type="2" from="960" bitmask="1" />
+        </ReadAddr>
+        <ReadAddr type="2" from="2560" bitmask="16" />
+      </Register>
+      <Register name="Ch">
+        <ReadAddr type="0" from="448" bitmask="1" />
+        <ReadAddr type="1">
+          <Item type="1" from="1216" bitmask="1" />
+          <Item type="2" from="960" bitmask="1" />
+        </ReadAddr>
+        <ReadAddr type="2" from="3072" bitmask="32" />
+      </Register>
+      <Register name="D">
+        <ReadAddr type="2" from="4096" bitmask="16" />
+      </Register>
+      <Register name="De">
+        <ReadAddr type="2" from="3584" bitmask="16" />
+      </Register>
+    </RegisterReadAddrList>
+    <!--参数区的具体信息-->
+    <ParamRegion from="32768" len="92">
+      <Item name="程序总步数" type="0" offset="0" len="2" />
+      <Item name="PLC密码" type="4" offset="8" len="2" />
+      <Item name="PLC标题" type="8" offset="16" len="32" />
+      <Item name="M锁存起始" type="24" offset="48" len="2" />
+      <Item name="M锁存结束" type="25" offset="50" len="2" />
+      <Item name="S锁存起始" type="26" offset="52" len="2" />
+      <Item name="S锁存结束" type="27" offset="54" len="2" />
+      <Item name="C锁存起始(16位)" type="28" offset="56" len="2" />
+      <Item name="C锁存结束(16位)" type="29" offset="58" len="2" />
+      <Item name="C锁存起始(32位)" type="30" offset="60" len="2" />
+      <Item name="C锁存结束(32位)" type="31" offset="62" len="2" />
+      <Item name="D锁存起始" type="32" offset="64" len="2" />
+      <Item name="D锁存结束" type="33" offset="66" len="2" />
+      <Item name="文件寄存器起始" type="36" offset="72" len="2" />
+      <Item name="文件寄存器容量块数" type="37" offset="74" len="2" />
+      <Item name="注释起始" type="38" offset="76" len="2" />
+      <Item name="注释容量块" type="39" offset="78" len="2" />
+    </ParamRegion>
+    <!--特殊寄存器区域的具体信息-->
+    <SpecialRegion from="3584" len="256">
+      <Item name="监控定时器" type="0" offset="0" len="2" />
+      <Item name="PLC型号和系统版本号" type="1" offset="2" len="2" />
+      <Item name="内存容量" type="2" offset="4" len="2" />
+      <Item name="内存类型" type="3" offset="6" len="2" />
+      <Item name="PLC错误时的特M号码" type="4" offset="8" len="2" />
+      <Item name="电池电压值" type="5" offset="10" len="2" />
+      <Item name="电池电压降低的检测值" type="6" offset="12" len="2" />
+      <Item name="瞬时停止检测次数" type="7" offset="14" len="2" />
+      <Item name="停电检测时间" type="8" offset="16" len="2" />
+      <Item name="24V DC故障模块号码" type="9" offset="18" len="2" />
+      <Item name="当前扫描值" type="10" offset="20" len="2" />
+      <Item name="最小扫描时间" type="11" offset="22" len="2" />
+      <Item name="最大扫描时间" type="12" offset="24" len="2" />
+      <Item name="秒" type="13" offset="26" len="2" />
+      <Item name="分" type="14" offset="28" len="2" />
+      <Item name="时" type="15" offset="30" len="2" />
+      <Item name="日" type="16" offset="32" len="2" />
+      <Item name="月" type="17" offset="34" len="2" />
+      <Item name="年" type="18" offset="36" len="2" />
+      <Item name="星期" type="19" offset="38" len="2" />
+      <Item name="输入滤波设定1" type="20" offset="40" len="2" />
+      <Item name="输入滤波设定2" type="21" offset="42" len="2" />
+
+      <Item name="Z0寄存器内容" type="28" offset="56" len="2" />
+      <Item name="V0寄存器内容" type="29" offset="58" len="2" />
+      <Item name="No1模拟容量值" type="30" offset="60" len="2" />
+      <Item name="No2模拟容量值" type="31" offset="62" len="2" />
+
+      <Item name="恒定扫描时间" type="39" offset="78" len="2" />
+      <Item name="第1个活动STL状态号" type="40" offset="80" len="2" />
+      <Item name="第2个活动STL状态号" type="41" offset="82" len="2" />
+      <Item name="第3个活动STL状态号" type="42" offset="84" len="2" />
+      <Item name="第4个活动STL状态号" type="43" offset="86" len="2" />
+      <Item name="第5个活动STL状态号" type="44" offset="88" len="2" />
+      <Item name="第6个活动STL状态号" type="45" offset="90" len="2" />
+      <Item name="第7个活动STL状态号" type="46" offset="92" len="2" />
+      <Item name="第8个活动STL状态号" type="47" offset="94" len="2" />
+
+      <Item name="最小的活动状态" type="49" offset="98" len="2" />
+
+      <Item name="IO配置错误" type="60" offset="120" len="2" />
+      <Item name="PLC硬件错误1" type="61" offset="122" len="2" />
+      <Item name="PLC硬件错误2" type="62" offset="124" len="2" />
+      <Item name="串行口通讯错误(Ch1)" type="63" offset="126" len="2" />
+      <Item name="参数错误" type="64" offset="128" len="2" />
+      <Item name="语法错误" type="65" offset="130" len="2" />
+      <Item name="回路错误" type="66" offset="132" len="2" />
+      <Item name="操作错误" type="67" offset="134" len="2" />
+      <Item name="操作错误步号" type="68" offset="136" len="2" />
+      <Item name="错误M8065至M8067的步" type="69" offset="138" len="2" />
+      <Item name="并行链接错误判定时间" type="70" offset="140" len="2" />
+
+      <Item name="剩余取样次数" type="74" offset="148" len="2" />
+      <Item name="取样次数设定" type="75" offset="150" len="2" />
+      <Item name="取样周期" type="76" offset="152" len="2" />
+      <Item name="触发指定" type="77" offset="154" len="2" />
+      <Item name="触发条件设置" type="78" offset="156" len="2" />
+      <Item name="取样数据指针" type="79" offset="158" len="2" />
+      <Item name="位设备号码No0" type="80" offset="160" len="2" />
+      <Item name="位设备号码No1" type="81" offset="162" len="2" />
+      <Item name="位设备号码No2" type="82" offset="164" len="2" />
+      <Item name="位设备号码No3" type="83" offset="166" len="2" />
+      <Item name="位设备号码No4" type="84" offset="168" len="2" />
+      <Item name="位设备号码No5" type="85" offset="170" len="2" />
+      <Item name="位设备号码No6" type="86" offset="172" len="2" />
+      <Item name="位设备号码No7" type="87" offset="174" len="2" />
+      <Item name="位设备号码No8" type="88" offset="176" len="2" />
+      <Item name="位设备号码No9" type="89" offset="178" len="2" />
+      <Item name="位设备号码No10" type="90" offset="180" len="2" />
+      <Item name="位设备号码No11" type="91" offset="182" len="2" />
+      <Item name="位设备号码No12" type="92" offset="184" len="2" />
+      <Item name="位设备号码No13" type="93" offset="186" len="2" />
+      <Item name="位设备号码No14" type="94" offset="188" len="2" />
+      <Item name="位设备号码No15" type="95" offset="190" len="2" />
+      <Item name="字设备号码No0" type="96" offset="192" len="2" />
+      <Item name="字设备号码No1" type="97" offset="194" len="2" />
+      <Item name="字设备号码No2" type="98" offset="196" len="2" />
+      <Item name="高速循环计数器" type="99" offset="198" len="2" />
+
+      <Item name="序列器机种名版本" type="101" offset="202" len="2" />
+
+      <Item name="功能扩展存储种类代码" type="104" offset="208" len="2" />
+      <Item name="功能扩展存储器的版本" type="105" offset="210" len="2" />
+
+      <Item name="设备注释登记数" type="107" offset="214" len="2" />
+      <Item name="特殊模块连接台数" type="108" offset="216" len="2" />
+      <Item name="输出刷新错误" type="109" offset="218" len="2" />
+
+      <Item name="Ch1数字值(FX1N-2AD-BD)" type="112" offset="224" len="2" />
+      <Item name="Ch2数字值(FX1N-2AD-BD)" type="113" offset="226" len="2" />
+      <Item name="Ch1数字值(FX1N-1AD-BD)" type="114" offset="228" len="2" />
+    </SpecialRegion>
+    <!--程序开始地址-->
+    <ProgramRegion from="32860"/>
+    <BasicCmdList>
+      <Cmd name="END" comment="结束">
+        <Character type="0" value="000F" />
+      </Cmd>
+      <Cmd name="RET" comment="退出STL">
+        <Character type="0" value="F7FF"/>
+      </Cmd>
+      <Cmd name="ANB" comment="回路块与">
+        <Character type="0" value="FFF8" />
+      </Cmd>
+      <Cmd name="ORB" comment="回路块或">
+        <Character type="0" value="FFF9" />
+      </Cmd>
+      <Cmd name="MPS" comment="进栈">
+        <Character type="0" value="FFFA" />
+      </Cmd>
+      <Cmd name="MRD"  comment="读栈">
+        <Character type="0" value="FFFB" />
+      </Cmd>
+      <Cmd name="MPP"  comment="出栈">
+        <Character type="0" value="FFFC" />
+      </Cmd>
+      <Cmd name="INV"  comment="反转">
+        <Character type="0" value="FFFD" />
+      </Cmd>
+      <Cmd name="NOP"  comment="空操作">
+        <Character type="0" value="FFFF" />
+      </Cmd>
+      <Cmd name="LD"  comment="取">
+        <Character type="1" value="2000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01C2 A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="LDI"  comment="取反转">
+        <Character type="1" value="3000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01C3 A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="AND"  comment="与">
+        <Character type="1" value="4000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01C4 A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="ANI"  comment="与反转">
+        <Character type="1" value="5000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01C5 A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="OR"  comment="或">
+        <Character type="1" value="6000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01C6 A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="ORI"  comment="或反转">
+        <Character type="1" value="7000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01C7 A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="P"  comment="跳转指针">
+        <Character type="1" value="B000+ppp" min="0" max="127" adapterType="3" />
+      </Cmd>
+      <Cmd name="SET"  comment="置位">
+        <Character type="1" value="D000+ppp" adapter="Y,M" adapterType="1" />
+        <Character type="2" value="0003 8000+ppp" adapter="Ms" adapterType="1" />
+        <Character type="2" value="0003 A000+ppp" adapter="Mp" adapterType="1" />
+        <Character type="2" value="0006 8000+ppp" adapter="S" adapterType="1" />
+      </Cmd>
+      <Cmd name="STL" comment="STL">
+        <Character type="1" value="F000+ppp" adapter="S" adapterType="1"/>
+      </Cmd>
+      <Cmd name="RST"  comment="复位">
+        <Character type="1" value="E000+ppp" adapter="Y,M" adapterType="1" />
+        <Character type="2" value="0004 8000+ppp" adapter="Ms" adapterType="1" />
+        <Character type="2" value="0004 A000+ppp" adapter="Mp" adapterType="1" />
+        <Character type="2" value="0007 8000+ppp" adapter="S" adapterType="1" />
+        <Character type="2" value="000C 8000+ppp" adapter="T,C,Ch" adapterType="1" />
+      </Cmd>
+      <Cmd name="PLS"  comment="脉冲">
+        <Character type="2" value="0008 8000+ppp" adapter="Y,M" adapterType="1" />
+      </Cmd>
+      <Cmd name="PLF"  comment="下降沿脉冲">
+        <Character type="2" value="0009 8000+ppp" adapter="Y,M" adapterType="1" />
+      </Cmd>
+      <!--这个地方少了MC，先放着-->
+      <Cmd name="MCR"  comment="主控复位">
+        <Character type="2" value="000B 8000+ppp" min="0" max="7" adapterType="3" />
+      </Cmd>
+      <Cmd name="LDP"  comment="取脉冲上升沿">
+        <Character type="2" value="01CA 8000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01CA A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="LDF"  comment="取脉冲下降沿">
+        <Character type="2" value="01CB 8000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01CB A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="ANDP"  comment="与脉冲上升沿">
+        <Character type="2" value="01CC 8000+ppp" adapter="Mp"  adapterType="0"/>
+        <Character type="2" value="01CC A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="ANDF"  comment="与脉冲下降沿">
+        <Character type="2" value="01CD 8000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01CD A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="ORP"  comment="或脉冲上升沿">
+        <Character type="2" value="01CE 8000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01CE A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="ORF"  comment="或脉冲下降沿">
+        <Character type="2" value="01CF 8000+ppp" adapter="Mp" adapterType="0" />
+        <Character type="2" value="01CF A000+ppp" adapter="Mp" adapterType="1" />
+      </Cmd>
+      <Cmd name="OUT"  comment="输出">
+        <Character type="1" value="C000+ppp" adapter="Y,M" adapterType="1" />
+        <Character type="2" value="0002 8000+ppp" adapter="Ms" adapterType="1" />
+        <Character type="2" value="0002 A000+ppp" adapter="Mp" adapterType="1" />
+        <Character type="2" value="0005 8000+ppp" adapter="S" adapterType="1" />
+        <Character type="3" value="0000+{0} 8000+{1}.xx 8000+{1}.yy" adapter="T,K" adapterType="2"/>
+        <Character type="3" value="0000+{0} 8000+{1}.xx 8000+{1}.yy" adapter="C,K" adapterType="2" />
+        <Character type="4" value="0000+{0} 8000+{1}.xx 8000+{1}.yy 8000+{1}.zz 8000+{1}.ww" adapter="Ch,K" adapterType="2" />
+      </Cmd>
+    </BasicCmdList>
+    <AppCmdList>
+      <Cmd name="CJ" funcNO="00" comment="条件跳转" group="程序流程" />
+      <Cmd name="CALL" funcNO="01" comment="子程序调用" group="程序流程" />
+      <Cmd name="SRET" funcNO="02" comment="子程序返回" group="程序流程" />
+      <Cmd name="IRET" funcNO="03" comment="中断返回" group="程序流程" />
+      <Cmd name="EI" funcNO="04" comment="中断许可" group="程序流程" />
+      <Cmd name="DI" funcNO="05" comment="中断禁止" group="程序流程" />
+      <Cmd name="FEND" funcNO="06" comment="主程序结束" group="程序流程" />
+      <Cmd name="WDT" funcNO="07" comment="监控定时器" group="程序流程" />
+      <Cmd name="FOR" funcNO="08" comment="循环范围开始" group="程序流程" />
+      <Cmd name="NEXT" funcNO="09" comment="循环范围终了" group="程序流程" />
+      <Cmd name="CMP" funcNO="10" comment="比较" group="传送与比较" />
+      <Cmd name="ZCP" funcNO="11" comment="区域比较" group="传送与比较" />
+      <Cmd name="MOV" funcNO="12" comment="传送" group="传送与比较" />
+      <Cmd name="SMOV" funcNO="13" comment="移位传送" group="传送与比较" />
+      <Cmd name="CML" funcNO="14" comment="倒转传送" group="传送与比较" />
+      <Cmd name="BMOV" funcNO="15" comment="一并传送" group="传送与比较" />
+      <Cmd name="RMOV" funcNO="16" comment="多点传送" group="传送与比较" />
+      <Cmd name="XCH" funcNO="17" comment="交换" group="传送与比较" />
+      <Cmd name="BCD" funcNO="18" comment="BCD转换" group="传送与比较" />
+      <Cmd name="BIN" funcNO="19" comment="BIN转换" group="传送与比较" />
+      <Cmd name="ADD" funcNO="20" comment="BIN加法" group="四则逻辑运算" />
+      <Cmd name="SUB" funcNO="21" comment="BIN减法" group="四则逻辑运算" />
+      <Cmd name="MUL" funcNO="22" comment="BIN乘法" group="四则逻辑运算" />
+      <Cmd name="DIV" funcNO="23" comment="BIN除法" group="四则逻辑运算" />
+      <Cmd name="INC" funcNO="24" comment="BIN加1" group="四则逻辑运算" />
+      <Cmd name="DEC" funcNO="25" comment="BIN减1" group="四则逻辑运算" />
+      <Cmd name="WAND" funcNO="26" comment="逻辑字与" group="四则逻辑运算" />
+      <Cmd name="WOR" funcNO="27" comment="逻辑字或" group="四则逻辑运算" />
+      <Cmd name="WXOR" funcNO="28" comment="逻辑字异或" group="四则逻辑运算" />
+      <Cmd name="NEG" funcNO="29" comment="求补码" group="四则逻辑运算" />
+      <Cmd name="ROR" funcNO="30" comment="循环右移" group="循环移位" />
+      <Cmd name="ROL" funcNO="31" comment="循环左移" group="循环移位" />
+      <Cmd name="RCR" funcNO="32" comment="带进位循环右移" group="循环移位" />
+      <Cmd name="RCL" funcNO="33" comment="带进位循环左移" group="循环移位" />
+      <Cmd name="SFTR" funcNO="34" comment="位右移" group="循环移位" />
+      <Cmd name="SFTL" funcNO="35" comment="位左移" group="循环移位" />
+      <Cmd name="WSFR" funcNO="36" comment="字右移" group="循环移位" />
+      <Cmd name="WSFL" funcNO="37" comment="字左移" group="循环移位" />
+      <Cmd name="SFWR" funcNO="38" comment="移位写入" group="循环移位" />
+      <Cmd name="SFRD" funcNO="39" comment="移位读出" group="循环移位" />
+      <Cmd name="ZRST" funcNO="40" comment="批次复位" group="数据处理" />
+      <Cmd name="DECO" funcNO="41" comment="译码" group="数据处理" />
+      <Cmd name="ENCO" funcNO="42" comment="编码" group="数据处理" />
+      <Cmd name="SUM" funcNO="43" comment="ON位数" group="数据处理" />
+      <Cmd name="BON" funcNO="44" comment="ON位数判定" group="数据处理" />
+      <Cmd name="MEAN" funcNO="45" comment="平均值" group="数据处理" />
+      <Cmd name="ANS" funcNO="46" comment="信号报警置位" group="数据处理" />
+      <Cmd name="ANR" funcNO="47" comment="信号报警复位" group="数据处理" />
+      <Cmd name="SOR" funcNO="48" comment="BIN开方" group="数据处理" />
+      <Cmd name="FLT" funcNO="49" comment="BIN整数→2进制浮点数转换" group="数据处理" />
+      <Cmd name="REF" funcNO="50" comment="输入输出刷新" group="高速处理" />
+      <Cmd name="REFF" funcNO="51" comment="滤波器调整" group="高速处理" />
+      <Cmd name="MTR" funcNO="52" comment="矩阵输入" group="高速处理" />
+      <Cmd name="HSCS" funcNO="53" comment="比较置位(高速计数器)" group="高速处理" />
+      <Cmd name="HSCR" funcNO="54" comment="比较复位(高速计数器)" group="高速处理" />
+      <Cmd name="HSZ" funcNO="55" comment="区间比较" group="高速处理" />
+      <Cmd name="SPD" funcNO="56" comment="脉冲密度" group="高速处理" />
+      <Cmd name="PLSY" funcNO="57" comment="脉冲输出" group="高速处理" />
+      <Cmd name="PWM" funcNO="58" comment="脉冲调制" group="高速处理" />
+      <Cmd name="PLSR" funcNO="59" comment="带加减速的脉冲输出" group="高速处理" />
+      <Cmd name="IST" funcNO="60" comment="初始化状态" group="方便指令" />
+      <Cmd name="SER" funcNO="61" comment="数据查找" group="方便指令" />
+      <Cmd name="ABSD" funcNO="62" comment="凸轮控制(绝对方式)" group="方便指令" />
+      <Cmd name="INCD" funcNO="63" comment="凸轮控制(增量方式)" group="方便指令" />
+      <Cmd name="TTMR" funcNO="64" comment="示教定时器" group="方便指令" />
+      <Cmd name="STMR" funcNO="65" comment="特殊定时器" group="方便指令" />
+      <Cmd name="ALT" funcNO="66" comment="交替输出" group="方便指令" />
+      <Cmd name="RAMP" funcNO="67" comment="斜坡信号" group="方便指令" />
+      <Cmd name="ROTC" funcNO="68" comment="旋转工作台控制" group="方便指令" />
+      <Cmd name="SORT" funcNO="69" comment="数据排列" group="方便指令" />
+      <Cmd name="TKY" funcNO="70" comment="数字输入" group="外围设备IO" />
+      <Cmd name="HKY" funcNO="71" comment="16键输入" group="外围设备IO" />
+      <Cmd name="DSW" funcNO="72" comment="数字式开关" group="外围设备IO" />
+      <Cmd name="SEGD" funcNO="73" comment="7段详码" group="外围设备IO" />
+      <Cmd name="SEGL" funcNO="74" comment="7段码按时间分割显示" group="外围设备IO" />
+      <Cmd name="ARWS" funcNO="75" comment="箭头开关" group="外围设备IO" />
+      <Cmd name="ASC" funcNO="76" comment="ASCII码变换" group="外围设备IO" />
+      <Cmd name="PR" funcNO="77" comment="ASCII码打印输出" group="外围设备IO" />
+      <Cmd name="FROM" funcNO="78" comment="BFM读出" group="外围设备IO" />
+      <Cmd name="TO" funcNO="79" comment="BFM写入" group="外围设备IO" />
+      <Cmd name="RS" funcNO="80" comment="串行数据传送" group="外围设备SER" />
+      <Cmd name="PRUN" funcNO="81" comment="8进制位传送" group="外围设备SER" />
+      <Cmd name="ASCI" funcNO="82" comment="HEX-ASCII转换" group="外围设备SER" />
+      <Cmd name="HEX" funcNO="83" comment="ASCII-HEX转换" group="外围设备SER" />
+      <Cmd name="CCD" funcNO="84" comment="校验码" group="外围设备SER" />
+      <Cmd name="VRRD" funcNO="85" comment="电位器读出" group="外围设备SER" />
+      <Cmd name="VRSC" funcNO="86" comment="电位器刻度" group="外围设备SER" />
+      <Cmd name="PID" funcNO="88" comment="PIC运算" group="外围设备SER" />
+      <Cmd name="ECMP" funcNO="110" comment="2进制浮点数比较" group="浮点数" />
+      <Cmd name="EZCP" funcNO="111" comment="2进制浮点数区间比较" group="浮点数" />
+      <Cmd name="EBCD" funcNO="118" comment="2进制浮点数-10进制浮点数转换" group="浮点数" />
+      <Cmd name="EBIN" funcNO="119" comment="10进制浮点数-2进制浮点数转换" group="浮点数" />
+      <Cmd name="EADD" funcNO="120" comment="2进制浮点数加法" group="浮点数" />
+      <Cmd name="ESUB" funcNO="121" comment="2进制浮点数减法" group="浮点数" />
+      <Cmd name="EMUL" funcNO="122" comment="2进制浮点数乘法" group="浮点数" />
+      <Cmd name="EDIV" funcNO="123" comment="2进制浮点数除法" group="浮点数" />
+      <Cmd name="ESOR" funcNO="127" comment="2进制浮点数开方" group="浮点数" />
+      <Cmd name="INT" funcNO="129" comment="2进制浮点数-BIN整数转换" group="浮点数" />
+      <Cmd name="SIN" funcNO="130" comment="浮点数Sin运算" group="浮点数" />
+      <Cmd name="COS" funcNO="131" comment="浮点数Cos运算" group="浮点数" />
+      <Cmd name="TAN" funcNO="132" comment="浮点数Tan运算" group="浮点数" />
+      <Cmd name="SWAP" funcNO="147" comment="上下字节变换" group="其他" />
+      <Cmd name="ABS" funcNO="155" comment="ABS现在值读出" group="定位" />
+      <Cmd name="ZRN" funcNO="156" comment="原点回归" group="定位" />
+      <!--<Cmd name="PLSY" funcNO="157" comment="可变度的脉冲输出" group="定位" />-->
+      <Cmd name="DRVI" funcNO="158" comment="相对定位" group="定位" />
+      <Cmd name="DRVA" funcNO="159" comment="绝对定位" group="定位" />
+      <Cmd name="TCMP" funcNO="160" comment="时钟数据比较" group="时钟连算" />
+      <Cmd name="TZCP" funcNO="161" comment="时钟数据区间比较" group="时钟连算" />
+      <Cmd name="TADD" funcNO="162" comment="时钟数据加法" group="时钟连算" />
+      <Cmd name="TSUB" funcNO="163" comment="时钟数据减法" group="时钟连算" />
+      <Cmd name="TRD" funcNO="166" comment="时钟数据读出" group="时钟连算" />
+      <Cmd name="TWR" funcNO="167" comment="时钟数据写入" group="时钟连算" />
+      <Cmd name="HOUR" funcNO="169" comment="计时仪" group="时钟连算" />
+      <Cmd name="GRY" funcNO="170" comment="格雷码变换" group="外围设备" />
+      <Cmd name="GBIN" funcNO="171" comment="格雷码逆变换" group="外围设备" />
+      <Cmd name="RD3A" funcNO="176" comment="模拟块读出" group="外围设备" />
+      <Cmd name="WR3A" funcNO="177" comment="模拟块写入" group="外围设备" />
+      <Cmd name="LD=" funcNO="224" comment="(S1)=(S2)" group="接点比较" />
+      <Cmd name="LD&gt;" funcNO="225" comment="(S1)&gt;(S2)" group="接点比较" />
+      <Cmd name="LD&lt;" funcNO="226" comment="(S1)&lt;(S2)" group="接点比较" />
+      <Cmd name="LD&lt;&gt;" funcNO="228" comment="(S1)&lt;&gt;(S2)" group="接点比较" />
+      <Cmd name="LD&lt;=" funcNO="229" comment="(S1)&lt;=(S2)" group="接点比较" />
+      <Cmd name="LD&gt;=" funcNO="230" comment="(S1)&gt;=(S2)" group="接点比较" />
+      <Cmd name="AND=" funcNO="232" comment="(S1)=(S2)" group="接点比较" />
+      <Cmd name="AND&gt;" funcNO="233" comment="(S1)&gt;(S2)" group="接点比较" />
+      <Cmd name="AND&lt;" funcNO="234" comment="(S1)&lt;(S2)" group="接点比较" />
+      <Cmd name="AND&lt;&gt;" funcNO="236" comment="(S1)&lt;&gt;(S2)" group="接点比较" />
+      <Cmd name="AND&lt;=" funcNO="237" comment="(S1)&lt;=(S2)" group="接点比较" />
+      <Cmd name="AND&gt;=" funcNO="238" comment="(S1)&gt;=(S2)" group="接点比较" />
+      <Cmd name="OR=" funcNO="240" comment="(S1)=(S2)" group="接点比较" />
+      <Cmd name="OR&gt;" funcNO="241" comment="(S1)&gt;(S2)" group="接点比较" />
+      <Cmd name="OR&lt;" funcNO="242" comment="(S1)&lt;(S2)" group="接点比较" />
+      <Cmd name="OR&lt;&gt;" funcNO="244" comment="(S1)&lt;&gt;(S2)" group="接点比较" />
+      <Cmd name="OR&lt;=" funcNO="245" comment="(S1)&lt;=(S2)" group="接点比较" />
+      <Cmd name="OR&gt;=" funcNO="246" comment="(S1)&gt;=(S2)" group="接点比较" />
+    </AppCmdList>
+  </AttributeList>
+</FXSeries>
