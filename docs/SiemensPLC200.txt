@@ -1,1 +1,1 @@
-1.�ȵ�MicroWinĿ¼��ע�������ӵ�com���reg.cmd���Ҽ��Թ���ԱȨ��ִ��
+﻿1.先到MicroWin目录下注册西门子的com组件reg.cmd，右键以管理员权限执行

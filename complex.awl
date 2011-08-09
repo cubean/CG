@@ -1,31 +1,31 @@
-ORGANIZATION_BLOCK ������:OB1
-TITLE=����ע��: ��������ʥ¡���ó���޹�˾-��ʽ��Ӧ��
+ORGANIZATION_BLOCK 主程序:OB1
+TITLE=程序注释: 北京东方圣隆达科贸有限公司-管式反应器
 // 
-// PLC��ΪModbus��վ������11��west�Ǳ���
+// PLC作为Modbus主站，连接11块west仪表。
 // 
 // 
 BEGIN
 Network 1 
-// ��һɨ������, ��λ����־λ����ʼλ,��ʼ��
+// 第一扫秒周期, 复位各标志位和起始位,初始化
 LD     SM0.1
 R      M2.0, 8
 R      M4.0, 8
 R      M0.0, 8
-CALL   SBR4                        // ��ʼ��������
-CALL   SBR7                        // ��ʼ���豸״̬
-CALL   SBR9                        // ��ʼ�����ټ�����
+CALL   SBR4                        // 初始化变量表
+CALL   SBR7                        // 初始化设备状态
+CALL   SBR9                        // 初始化高速计数器
 CALL   SBR5
 MOVW   20, VW1036
 Network 2 
-// �趨�ֶ��Զ�ָʾ��
+// 设定手动自动指示灯
 LD     I1.1
 =      Q0.1
 Network 3 
-// �趨�����ܿ���ָʾ��
+// 设定加热总开关指示灯
 LD     I0.4
 =      Q0.2
 Network 4 
-// ��������Ǳ���������趨�Ǳ�����ָʾ�ƣ��϶α���
+// 下面根据仪表报警输出设定仪表警报指示灯，上段报警
 LD     I0.6
 LD     I1.3
 NOT
@@ -33,7 +33,7 @@ A      Q0.5
 OLD
 =      Q0.5
 Network 5 
-// �жα���
+// 中段报警
 LD     I0.7
 LD     I1.3
 NOT
@@ -41,7 +41,7 @@ A      Q0.6
 OLD
 =      Q0.6
 Network 6 
-// �¶α���
+// 下段报警
 LD     I1.0
 LD     I1.3
 NOT
@@ -49,7 +49,7 @@ A      Q0.7
 OLD
 =      Q0.7
 Network 7 
-// ��Ӧ���¶ȱ���
+// 反应釜温度报警
 LD     I1.4
 LD     I1.3
 NOT
@@ -57,7 +57,7 @@ A      Q1.0
 OLD
 =      Q1.0
 Network 8 
-// Ԥ�ȹ��¶ȱ���
+// 预热管温度报警
 LD     I1.5
 LD     I1.3
 NOT
@@ -65,7 +65,7 @@ A      Q1.1
 OLD
 =      Q1.1
 Network 9 
-// �������¶ȱ���
+// 除分离温度报警
 LD     I2.0
 LD     I1.3
 NOT
@@ -73,7 +73,7 @@ A      Q2.0
 OLD
 =      Q2.0
 Network 10 
-// ��ѹ������
+// 上压力报警
 LD     I2.1
 LD     I1.3
 NOT
@@ -81,7 +81,7 @@ A      Q2.1
 OLD
 =      Q2.1
 Network 11 
-// ��ѹ������
+// 下压力报警
 LD     I2.2
 LD     I1.3
 NOT
@@ -89,7 +89,7 @@ A      Q2.2
 OLD
 =      Q2.2
 Network 12 
-// ���ݱ��ı�������趨������ָʾ��
+// 根据表的报警情况设定报警总指示灯
 LD     I0.6
 O      I0.7
 O      I1.0
@@ -106,7 +106,7 @@ OLD
 =      M0.2
 =      Q2.3
 Network 13 
-// �趨���ȿ��أ�����=(�ֶ� or ��̬�����ܿ���)  and �������ܿ��� and �ޱ���
+// 设定加热开关：加热=(手动 or 组态加热总开关)  and 面板加热总开关 and 无报警
 LD     I1.1
 O      V3260.0
 A      I1.2
@@ -115,35 +115,35 @@ AN     M0.2
 =      Q0.3
 =      Q0.4
 Network 14 
-// Modbus ��վ��ʼ����ɺ�, ������дָ��
-// M0.5=1��ʾMBUS_CTRL��ʼ�����
-// M0.5��ÿ�������ر�ʾ��ʼһ�ζ�д�������
-// M0.5����1ʱ����ʾ���ڶ�д������
+// Modbus 主站初始化完成后, 启动读写指令
+// M0.5=1表示MBUS_CTRL初始化完成
+// M0.5的每个上升沿表示开始一次读写操作完成
+// M0.5等于1时，表示正在读写过程中
 LD     M0.0
 EU
 S      M0.5, 1
-Network 15 // �������
+Network 15 // 网络标题
 // 
-// ����ע��     ��ʼ��Modbus ��վͨ��,
+// 网络注释     初始化Modbus 主站通信,
 // 
-// EN          ʹ�ܣ����뱣֤ÿһɨ�����ڶ���ʹ�ܣ�ʹ��SM0.0)
+// EN          使能：必须保证每一扫描周期都被使能（使用SM0.0)
 // 
-// Mode      ģʽ����Ϊ1��ʹ�� Modbus Э�鹦�ܣ�Ϊ0 ʱ�ָ�Ϊϵͳ PPI Э��
+// Mode      模式：常为1，使能 Modbus 协议功能；为0 时恢复为系统 PPI 协议
 // 
-// Baud       �����ʣ���Ϊ9600��Ҫ���վ�����ʶ�Ӧ
+// Baud       波特率：设为9600，要与从站波特率对应
 // 
-// Parity       У�飺У�鷽ʽѡ�� 0����У�� 
+// Parity       校验：校验方式选择 0＝无校验 
 // 
-// Timeout    ��ʱ����վ�ȴ���վ��Ӧ��ʱ�䣬�Ժ���Ϊ��λ�����͵�����ֵΪ1000���루1�룩��
-//                             �������õķ�ΧΪ 1��32767��
-//                 ע�⣺ ���ֵ���������㹻���Ա�֤��վ��ʱ����Ӧ��
+// Timeout    超时：主站等待从站响应的时间，以毫秒为单位，典型的设置值为1000毫秒（1秒），
+//                             允许设置的范围为 1－32767。
+//                 注意： 这个值必须设置足够大以保证从站有时间响应。
 // 
-// Done      ���λ����ʼ����ɣ���λ���Զ���1�������ø�λ���� MBUS_MSG ��д����
+// Done      完成位：初始化完成，此位会自动置1。可以用该位启动 MBUS_MSG 读写操作
 // 
-// Error       ��ʼ��������루ֻ���� Done λΪ1ʱ��Ч����0�� �޴���
-//                                                                                                                1�� У��ѡ��Ƿ�
-//                                                                                                                2�� ������ѡ��Ƿ�
-//                                                                                                                3�� ģʽѡ��Ƿ�
+// Error       初始化错误代码（只有在 Done 位为1时有效）：0＝ 无错误
+//                                                                                                                1＝ 校验选择非法
+//                                                                                                                2＝ 波特率选择非法
+//                                                                                                                3＝ 模式选择非法
 // 
 LD     SM0.0
 =      L60.0
@@ -153,75 +153,75 @@ LD     L60.0
 CALL   SBR1, L63.7, 9600, 0, 1000, M0.0, MB1
 Network 16 
 // 
-// ��ȡ��վ���ּĴ���������
+// 读取从站保持寄存器的数据
 // 
-// EN             ʹ�ܣ�ͬһʱ��ֻ����һ����д���ܣ��� MBUS_MSG��ʹ��
-//                   ע�⣺����ÿһ����д���ܣ��� MBUS_MSG��������һ�� MBUS_MSG ָ��� Done ���λ����
-//                               ��Ա�֤���ж�дָ��ѭ�����У������򣩡� 
+// EN             使能：同一时刻只能有一个读写功能（即 MBUS_MSG）使能
+//                   注意：建议每一个读写功能（即 MBUS_MSG）都用上一个 MBUS_MSG 指令的 Done 完成位来激
+//                               活，以保证所有读写指令循环进行（见程序）。 
 // 
-// First           ��д����λ��ÿһ���µĶ�д�������ʹ�����崥�� 
+// First           读写请求位：每一个新的读写请求必须使用脉冲触发 
 // 
-// Slave         ��վ��ַ����ѡ��ķ�Χ 1��247
+// Slave         从站地址：可选择的范围 1－247
 // 
-// RW           ��д������0������ 1��д
-//                  ע�⣺1. ����������ͱ��ּĴ���֧�ֶ���д����
-//                              2. �����������ģ��������ֻ֧�ֶ�����
+// RW           读写操作：0＝读， 1＝写
+//                  注意：1. 开关量输出和保持寄存器支持读和写功能
+//                              2. 开关量输入和模拟量输入只支持读功能
 // 
-// Addr          ��д��վ�����ݵ�ַ��ѡ���д���������� 00001��0xxxx�����������
-//                                                                                               10001��1xxxx������������
-//                                                                                               30001��3xxxx��ģ��������
-//                                                                                               40001��4xxxx�����ּĴ���
+// Addr          读写从站的数据地址：选择读写的数据类型 00001至0xxxx－开关量输出
+//                                                                                               10001至1xxxx－开关量输入
+//                                                                                               30001至3xxxx－模拟量输入
+//                                                                                               40001至4xxxx－保持寄存器
 // 
-// Count       ͨѶ�����ݸ�����λ���ֵĸ�����
-//                  ע�⣺ Modbus��վ�ɶ�/д�����������Ϊ120���֣���ָÿһ�� MBUS_MSG ָ�
+// Count       通讯的数据个数（位或字的个数）
+//                  注意： Modbus主站可读/写的最大数据量为120个字（是指每一个 MBUS_MSG 指令）
 // 
-// DataPtr     ����ָ�룺1. ����Ƕ�ָ����ص����ݷŵ������������
-//                                   2. �����дָ�Ҫд�������ݷŵ������������
+// DataPtr     数据指针：1. 如果是读指令，读回的数据放到这个数据区中
+//                                   2. 如果是写指令，要写出的数据放到这个数据区中
 // 
-// Done        ��д�������λ
+// Done        读写功能完成位
 // 
-// Error         ������� ֻ���� Done λΪ1ʱ������������Ч
-// ������룺 0���޴���
-//                      1����ӦУ�����
-//                      2��δ��
-//                      3�����ճ�ʱ����վ����Ӧ��
-//                      4�������������slave address,Modbus address,count,RW��
-//                      5��Modbus/���ɿ�δʹ�� 
-//                      6��Modbus����æ����������
-//                      7����Ӧ������Ӧ��������Ĳ�����
-//                      8����ӦCRCУ��ʹ���
+// Error         错误代码 只有在 Done 位为1时，错误代码才有效
+// 错误代码： 0＝无错误
+//                      1＝响应校验错误
+//                      2＝未用
+//                      3＝接收超时（从站无响应）
+//                      4＝请求参数错误（slave address,Modbus address,count,RW）
+//                      5＝Modbus/自由口未使能 
+//                      6＝Modbus正在忙于其它请求
+//                      7＝响应错误（响应不是请求的操作）
+//                      8＝响应CRC校验和错误
 // 
-//                  101�� ��վ��֧������Ĺ���
-//                  102�� ��վ��֧�����ݵ�ַ
-//                  103�� ��վ��֧�ִ�����������
-//                  104�� ��վ�豸����
-//                  105�� ��վ��������Ϣ��������Ӧ���ӳ�
-//                  106�� ��վæ���ܾ��˸���Ϣ
-//                  107�� ��վ�ܾ�����Ϣ
-//                  108�� ��վ�洢����ż����
+//                  101＝ 从站不支持请求的功能
+//                  102＝ 从站不支持数据地址
+//                  103＝ 从站不支持此种数据类型
+//                  104＝ 从站设备故障
+//                  105＝ 从站接受了信息，但是响应被延迟
+//                  106＝ 从站忙，拒绝了该信息
+//                  107＝ 从站拒绝了信息
+//                  108＝ 从站存储器奇偶错误
 // 
 // 
 // 
-// �����Ĵ����������룺
+// 常见的错误及其错误代码：
 // 
-// 1. ������ MBUS_MSG ָ��ͬʱʹ�ܻ����6�Ŵ���
+// 1. 如果多个 MBUS_MSG 指令同时使能会造成6号错误
 // 
-// 2. ��վ delay �������ʱ����������3�Ŵ���
+// 2. 从站 delay 参数设的时间过长会造成3号错误
 // 
-// 3. ��վ��������У�������϶������3�Ŵ���
+// 3. 从站掉电或不运行，网络故障都会造成3号错误
 // 
 Network 17 
-// ѡ�����
+// 选择变量
 LD     SM0.0
 A      M0.5
 EU
 CALL   SBR6, VW1500
 Network 18 
-// ѡ�������
-// 	3 ������Ҫд��
-// 	2 ������Ҫ���Զ�ȡ
-// 	1 ������Ҫ��ȡ
-// 	0 ��ȡ������Ϣʧ��
+// 选择变量，
+// 	3 变量需要写入
+// 	2 变量需要尝试读取
+// 	1 变量需要读取
+// 	0 获取变量信息失败
 LD     SM0.0
 A      M0.0
 A      M0.5
@@ -244,13 +244,13 @@ JMP    120
 LPP
 JMP    100
 Network 19 
-// �б�����Ҫ��
+// 有变量需要读
 LBL    110
 Network 20 
-// �б�����Ҫд
+// 有变量需要写
 LBL    120
 Network 21 
-// ��д��վ����
+// 读写从站数据
 LD     M0.5
 =      L60.0
 LD     M0.5
@@ -259,13 +259,13 @@ EU
 LD     L60.0
 CALL   SBR2, L63.7, VB1980, VB1024, VD1981, VW1985, VD1987, M2.2, MB4
 Network 22 
-// M0.5����0ʱ,ͨѶ���ڿ���״̬����ʱһ��ʱ�������M0.5Ϊ1����ʼ��һ��ͨѶ
+// M0.5等于0时,通讯处于空闲状态，延时一段时间后，设置M0.5为1，开始下一次通讯
 LD     SM0.0
 A      M0.0
 AN     M0.5
 TON    T33, VW1036
 Network 23 
-// ��ʱʱ�䵽������M0.5Ϊ1����λ��ʱ��
+// 延时时间到，设置M0.5为1，复位定时器
 LD     SM0.0
 A      M0.0
 AN     M0.5
@@ -273,12 +273,12 @@ A      T33
 S      M0.5, 1
 MOVW   0, T33
 Network 24 
-// if(��ȡ���)
+// if(读取完成)
 // {
-// 	��������
+// 	处理数据
 // }
 // 
-// MB4=3��ͨѶ��ʱ�������豸״̬Ϊ0����ͨѶ�Ͽ�����������豸�йص����б�����ÿ����������һ���豸״̬��Ϣ��
+// MB4=3：通讯超时，设置设备状态为0，即通讯断开；更新与该设备有关的所有变量（每个变量都有一个设备状态信息）
 LD     M2.2
 LPS
 AB=    MB4, 3
@@ -288,8 +288,8 @@ LPP
 AB<>   MB4, 3
 CALL   SBR0, 1, VD1000
 Network 25 
-// �����ȡ��ɣ������ÿ��б�־, ������״̬
-// M0.5����0�󣬽�����ʱ������ʱʱ�䵽֮������M0.5����1���ٴο�ʼ��һ�ζ�д��ŷ��Ŷ
+// 如果读取完成，则设置空闲标志, 清除完成状态
+// M0.5等于0后，进入延时程序，延时时间到之后，设置M0.5等于1，再次开始下一次读写擦欧洲哦
 LD     M2.2
 R      M0.5, 1
 R      M2.2, 1
@@ -297,7 +297,7 @@ Network 26
 LD     SM0.0
 JMP    255
 Network 27 
-// û�б�����Ҫ��ȡ�����ÿ��б�־
+// 没有变量需要读取，设置空闲标志
 LBL    100
 Network 28 
 LD     SM0.0
@@ -305,8 +305,8 @@ R      M0.5, 1
 Network 29 
 LBL    255
 Network 30 
-// ���ټ�����1��ÿ�����һ�Σ���ȡ��ǰ����ֵ������0
-// ʪʽ����������
+// 高速计数器1，每秒计算一次，获取当前计数值，并清0
+// 湿式气体流量计
 LD     SM0.5
 EU
 LPS
@@ -322,7 +322,7 @@ AD<>   VD3240, 0
 MOVD   0, VD3230
 MOVD   0, VD3240
 Network 31 
-// ���ټ�����0��ÿ�����һ�Σ���ȡ��ǰ����ֵ������0
+// 高速计数器0，每秒计算一次，获取当前计数值，并清0
 LD     SM0.5
 EU
 MOVD   HC0, VD1032
@@ -330,7 +330,7 @@ MOVB   16#C0, SMB37
 MOVD   0, SMD38
 HSC    0
 MOVD   VD1032, VD3250
-Network 32 // ���ǻ����ۼƺ�����
+Network 32 // 七星华创累计和清零
 LD     SM0.5
 EU
 LPS
@@ -347,7 +347,7 @@ AD<>   VD3268, 0
 MOVD   0, VD3264
 MOVD   0, VD3268
 Network 33 
-// �豸ͨѶʧ�ܱ���
+// 设备通讯失败报警
 LDN    SM0.0
 A      SM0.0
 LPS
@@ -358,7 +358,7 @@ AD<>   VD1976, 0
 S      Q2.3, 1
 END_ORGANIZATION_BLOCK
 SUBROUTINE_BLOCK SET_DEV_STATE:SBR0
-TITLE=�����豸״̬�������豸ͨѶʱ���¼���������ݵ�map
+TITLE=设置设备状态，更新设备通讯时间记录，复制数据到map
 VAR_INPUT
 state:WORD;
 tag_index:DWORD;
@@ -377,34 +377,34 @@ src:DWORD;
 map:DWORD;
 END_VAR
 BEGIN
-Network 1 // �������
-// ����AC�Ĵ���
+Network 1 // 网络标题
+// 保存AC寄存器
 LD     SM0.0
 MOVD   AC0, LD14
 MOVD   AC1, LD18
 MOVD   AC2, LD22
 MOVD   AC3, LD26
 Network 2 
-// ������Ϣ���׵�ַ
+// 变量信息的首地址
 LD     SM0.0
 MOVD   LD2, AC0
 *D     +20, AC0
 MOVD   VD1004, LD6
 +D     AC0, LD6
 Network 3 
-// ��ȡ�豸���
+// 获取设备序号
 LD     SM0.0
 MOVD   LD6, LD10
 +D     +11, LD10
 MOVD   1, AC1
 SLD    AC1, *LD10
 Network 4 
-// �豸״̬�쳣����λ
+// 设备状态异常，置位
 LD     SM0.0
 AW=    LW0, 0
 ORD    AC1, *VD1016
 Network 5 
-// �豸״̬����������
+// 设备状态正常，清零
 LD     SM0.0
 AW<>   LW0, 0
 INVD   AC1
@@ -416,7 +416,7 @@ MOVD   LD6, AC2
 +D     +12, AC2
 ORB    1, *AC2
 Network 7 
-// ���¶�ȡʱ��
+// 更新读取时间
 LD     SM0.0
 MOVD   0, AC0
 MOVB   *LD10, AC0
@@ -425,13 +425,13 @@ MOVD   VD1020, LD30
 +D     AC0, LD30
 BITIM  *LD30
 Network 8 
-// ��ȡ�����ļĴ�������
+// 获取变量的寄存器个数
 LD     SM0.0
 MOVD   LD6, AC1
 +D     +5, AC1
 MOVW   *AC1, LW38
 Network 9 
-// ��ȡ���ݴ洢��ַ
+// 获取数据存储地址
 LD     SM0.0
 MOVD   LD6, AC2
 +D     +7, AC2
@@ -443,11 +443,11 @@ MOVD   LD40, AC1
 MOVD   AC0, LD44
 +D     AC1, LD44
 Network 10 
-// ���ƶ�ȡ�����ݵ�map
+// 复制读取的数据到map
 LD     SM0.0
 BMW    *LD40, *LD44, AC0
 Network 11 
-// �ָ�AC�Ĵ���
+// 恢复AC寄存器
 LD     SM0.0
 MOVD   LD14, AC0
 MOVD   LD18, AC1
@@ -455,19 +455,19 @@ MOVD   LD22, AC2
 MOVD   LD26, AC3
 END_SUBROUTINE_BLOCK
 SUBROUTINE_BLOCK MBUS_CTRL:SBR1
-TITLE=���������������Դ���Զ�����˾ר�У������ڸ�����������Modbus ��վ�˿� 0 �⡱��һ���֡�
+TITLE=本代码归西门子能源与自动化公司专有，它属于附加软件包“Modbus 主站端口 0 库”的一部分。
 VAR_INPUT
-Mode:BOOL;	// 1 = Modbus, 0 = PPI����ֹ Modbus��
+Mode:BOOL;	// 1 = Modbus, 0 = PPI（终止 Modbus）
 
 Baud:DWORD;	//  1200, 2400 ... 115200
-Parity:BYTE;	// 0 = �ޣ�1 = ��У�飬2 = żУ��
-Timeout:INT;	// �Ժ����ʾ�Ĵ�վ��Ӧ��ʱ
+Parity:BYTE;	// 0 = 无，1 = 奇校验，2 = 偶校验
+Timeout:INT;	// 以毫秒表示的从站响应超时
 
 END_VAR
 VAR_OUTPUT
-Done:BOOL;	// ��ɱ�ǣ�ʼ�����ã�
+Done:BOOL;	// 完成标记（始终设置）
 
-Error:BYTE;	// ����״̬
+Error:BYTE;	// 错误状态
 
 END_VAR
 VAR
@@ -477,23 +477,23 @@ AC2save:DWORD;
 AC3save:DWORD;
 END_VAR
 BEGIN
-Network 1 // �� POU �����뱣�������ܱ༭�Ͳ鿴��
+Network 1 // 此 POU 受密码保护，不能编辑和查看。
 
 END_SUBROUTINE_BLOCK
 SUBROUTINE_BLOCK MBUS_MSG:SBR2
-TITLE=���������������Դ���Զ�����˾ר�У������ڸ�����������Modbus ��վ�˿� 0 �⡱��һ���֡�
+TITLE=本代码归西门子能源与自动化公司专有，它属于附加软件包“Modbus 主站端口 0 库”的一部分。
 VAR_INPUT
-First:BOOL;	// ����Ϣ������Ϊ 1 ʱ����������ɨ��һ�Σ�
-Slave:BYTE;	// ��վ��ַ��0 �� 247��
-RW:BYTE;	// �� = 0��д = 1
-Addr:DWORD;	// Modbus ��ַ���� 40001��
-Count:INT;	// Ԫ�ظ�����1 �� 120 ���ֻ� 1 �� 1920 λ��
-DataPtr:DWORD;	// ����ָ�루�� &VB100��
+First:BOOL;	// 新消息（设置为 1 时仅对新请求扫描一次）
+Slave:BYTE;	// 从站地址（0 到 247）
+RW:BYTE;	// 读 = 0，写 = 1
+Addr:DWORD;	// Modbus 地址（即 40001）
+Count:INT;	// 元素个数（1 到 120 个字或 1 到 1920 位）
+DataPtr:DWORD;	// 数据指针（即 &VB100）
 
 END_VAR
 VAR_OUTPUT
-Done:BOOL;	// ��ɱ�ǣ�0 = æ��1 = ��ɣ�
-Error:BYTE;	// ����0 = �޴���
+Done:BOOL;	// 完成标记（0 = 忙，1 = 完成）
+Error:BYTE;	// 错误（0 = 无错误）
 END_VAR
 VAR
 AC0save:DWORD;
@@ -501,11 +501,11 @@ AC1save:DWORD;
 AC2save:DWORD;
 END_VAR
 BEGIN
-Network 1 // �� POU �����뱣�������ܱ༭�Ͳ鿴��
+Network 1 // 此 POU 受密码保护，不能编辑和查看。
 
 END_SUBROUTINE_BLOCK
 SUBROUTINE_BLOCK MBUSM1:SBR3
-TITLE=���������������Դ���Զ�����˾ר�У������ڸ�����������Modbus ��վ�˿� 0 �⡱��һ���֡�
+TITLE=本代码归西门子能源与自动化公司专有，它属于附加软件包“Modbus 主站端口 0 库”的一部分。
 VAR_OUTPUT
 crc:WORD;
 END_VAR
@@ -514,11 +514,11 @@ count:INT;
 ptr:DWORD;
 END_VAR
 BEGIN
-Network 1 // �� POU �����뱣�������ܱ༭�Ͳ鿴��
+Network 1 // 此 POU 受密码保护，不能编辑和查看。
 
 END_SUBROUTINE_BLOCK
 SUBROUTINE_BLOCK INIT_TAG_TABLE:SBR4
-TITLE=��ʼ����Ҫ��ȡ�ı����б�
+TITLE=初始化需要读取的变量列表
 // 
 // 
 // struct
@@ -526,61 +526,61 @@ TITLE=��ʼ����Ҫ��ȡ�ı����б�
 // 	addr		DWORD
 // 	count		INT
 // 	dataprt		DWORD(pointer)
-// 	sn		BYTE վ˳��ţ���0��ʼ����stationnumͨѶ�쳣ʱ���豸״̬��Ϣ�ĵ�snλ��1.
-// 	bit_info		BYTE: bit0-��ȡ֮������Ϊ1��bit1-ֻ����־
+// 	sn		BYTE 站顺序号：从0开始。当stationnum通讯异常时，设备状态信息的第sn位置1.
+// 	bit_info		BYTE: bit0-读取之后，设置为1，bit1-只读标志
 // 	byte0-byte7	reserved
 // sizeof(struct) =20 bytes
 // 
-// �豸��Ϣ
-// 	VDxxxx		��ౣ��32���豸״̬����Ϣ
+// 设备信息
+// 	VDxxxx		最多保存32个设备状态的信息
 // 		
 // 	
-// վ��ַ	����ֵ��ַ	�趨ֵ��ַ	�豸����
-// 1	VW3000		VW3010		WEST���������������ƣ�
-// 2	VW3020		VW3030		WEST����Ƶ����
-// 3	VW3040		VW3050		WEST����Ԥ�ȸ��¶ȣ�
-// 4	VW3060		VW3070		WEST�������ȴ��¶ȣ�
-// 5	VW3080		VW3090		WEST������ʽ��Ӧ��3�μ��ȣ�-1
-// 6	VW3100		VW3110		WEST������ʽ��Ӧ��3�μ��ȣ�-2
-// 7	VW3120		VW3130		WEST������ʽ��Ӧ��3�μ��ȣ�-3
-// 8	VW3140		VW3150		WEST������ʽ��Ӧ���ڲ��¶ȣ�
-// 9	VW3160		VW3170		WEST����Һ�������¶Ȱ��ȣ�
-// 10	VW3180		VW3190		WEST��ѹ����������-1
-// 11	VW3200		VW3210		WEST��ѹ����������-2
+// 站地址	过程值地址	设定值地址	设备名称
+// 1	VW3000		VW3010		WEST（气体质量流量计）
+// 2	VW3020		VW3030		WEST（变频器）
+// 3	VW3040		VW3050		WEST表（预热釜温度）
+// 4	VW3060		VW3070		WEST表（伴热带温度）
+// 5	VW3080		VW3090		WEST表（管式反应器3段加热）-1
+// 6	VW3100		VW3110		WEST表（管式反应器3段加热）-2
+// 7	VW3120		VW3130		WEST表（管式反应器3段加热）-3
+// 8	VW3140		VW3150		WEST表（管式反应器内部温度）
+// 9	VW3160		VW3170		WEST（气液分离器温度伴热）
+// 10	VW3180		VW3190		WEST（压力传感器）-1
+// 11	VW3200		VW3210		WEST（压力传感器）-2
 // 
-// West����ַ=1,PV������ַ=VW3000, SV������ַ=VW3010
-// PV������Ϣ: 2000,2001,2005,2007,2011
-// SV������Ϣ: 2020,2021,2025,2027,2031
-// West����ַ=2,PV������ַ=VW3020, SV������ַ=VW3030
-// PV������Ϣ: 2040,2041,2045,2047,2051
-// SV������Ϣ: 2060,2061,2065,2067,2071
-// West����ַ=3,PV������ַ=VW3040, SV������ַ=VW3050
-// PV������Ϣ: 2080,2081,2085,2087,2091
-// SV������Ϣ: 2100,2101,2105,2107,2111
-// West����ַ=4,PV������ַ=VW3060, SV������ַ=VW3070
-// PV������Ϣ: 2120,2121,2125,2127,2131
-// SV������Ϣ: 2140,2141,2145,2147,2151
-// West����ַ=5,PV������ַ=VW3080, SV������ַ=VW3090
-// PV������Ϣ: 2160,2161,2165,2167,2171
-// SV������Ϣ: 2180,2181,2185,2187,2191
-// West����ַ=6,PV������ַ=VW3100, SV������ַ=VW3110
-// PV������Ϣ: 2200,2201,2205,2207,2211
-// SV������Ϣ: 2220,2221,2225,2227,2231
-// West����ַ=7,PV������ַ=VW3120, SV������ַ=VW3130
-// PV������Ϣ: 2240,2241,2245,2247,2251
-// SV������Ϣ: 2260,2261,2265,2267,2271
-// West����ַ=8,PV������ַ=VW3140, SV������ַ=VW3150
-// PV������Ϣ: 2280,2281,2285,2287,2291
-// SV������Ϣ: 2300,2301,2305,2307,2311
-// West����ַ=9,PV������ַ=VW3160, SV������ַ=VW3170
-// PV������Ϣ: 2320,2321,2325,2327,2331
-// SV������Ϣ: 2340,2341,2345,2347,2351
-// West����ַ=10,PV������ַ=VW3180, SV������ַ=VW3190
-// PV������Ϣ: 2360,2361,2365,2367,2371
-// SV������Ϣ: 2380,2381,2385,2387,2391
-// West����ַ=11,PV������ַ=VW3200, SV������ַ=VW3210
-// PV������Ϣ: 2400,2401,2405,2407,2411
-// SV������Ϣ: 2420,2421,2425,2427,2431
+// West表地址=1,PV变量地址=VW3000, SV变量地址=VW3010
+// PV定义信息: 2000,2001,2005,2007,2011
+// SV定义信息: 2020,2021,2025,2027,2031
+// West表地址=2,PV变量地址=VW3020, SV变量地址=VW3030
+// PV定义信息: 2040,2041,2045,2047,2051
+// SV定义信息: 2060,2061,2065,2067,2071
+// West表地址=3,PV变量地址=VW3040, SV变量地址=VW3050
+// PV定义信息: 2080,2081,2085,2087,2091
+// SV定义信息: 2100,2101,2105,2107,2111
+// West表地址=4,PV变量地址=VW3060, SV变量地址=VW3070
+// PV定义信息: 2120,2121,2125,2127,2131
+// SV定义信息: 2140,2141,2145,2147,2151
+// West表地址=5,PV变量地址=VW3080, SV变量地址=VW3090
+// PV定义信息: 2160,2161,2165,2167,2171
+// SV定义信息: 2180,2181,2185,2187,2191
+// West表地址=6,PV变量地址=VW3100, SV变量地址=VW3110
+// PV定义信息: 2200,2201,2205,2207,2211
+// SV定义信息: 2220,2221,2225,2227,2231
+// West表地址=7,PV变量地址=VW3120, SV变量地址=VW3130
+// PV定义信息: 2240,2241,2245,2247,2251
+// SV定义信息: 2260,2261,2265,2267,2271
+// West表地址=8,PV变量地址=VW3140, SV变量地址=VW3150
+// PV定义信息: 2280,2281,2285,2287,2291
+// SV定义信息: 2300,2301,2305,2307,2311
+// West表地址=9,PV变量地址=VW3160, SV变量地址=VW3170
+// PV定义信息: 2320,2321,2325,2327,2331
+// SV定义信息: 2340,2341,2345,2347,2351
+// West表地址=10,PV变量地址=VW3180, SV变量地址=VW3190
+// PV定义信息: 2360,2361,2365,2367,2371
+// SV定义信息: 2380,2381,2385,2387,2391
+// West表地址=11,PV变量地址=VW3200, SV变量地址=VW3210
+// PV定义信息: 2400,2401,2405,2407,2411
+// SV定义信息: 2420,2421,2425,2427,2431
 // 
 BEGIN
 Network 1 
@@ -589,11 +589,11 @@ MOVD   &VB1980, VD1012
 MOVD   &VB2000, VD1004
 MOVD   &VB1976, VD1016
 MOVD   &VB1600, VD1020
-Network 2 // �������
-// 1	VW3000		VW3010		WEST���������������ƣ�
-// West����ַ=1,PV������ַ=VW3000, SV������ַ=VW3010
-// PV������Ϣ: 2000,2001,2005,2007,2011
-// SV������Ϣ: 2020,2021,2025,2027,2031
+Network 2 // 网络标题
+// 1	VW3000		VW3010		WEST（气体质量流量计）
+// West表地址=1,PV变量地址=VW3000, SV变量地址=VW3010
+// PV定义信息: 2000,2001,2005,2007,2011
+// SV定义信息: 2020,2021,2025,2027,2031
 LD     SM0.0
 MOVB   1, VB2000
 MOVD   44097, VD2001
@@ -605,11 +605,11 @@ MOVD   44098, VD2021
 MOVW   1, VW2025
 MOVD   &VB3010, VD2027
 MOVB   0, VB2031
-Network 3 // �������
-// 2	VW3020		VW3030		WEST����Ƶ����
-// West����ַ=2,PV������ַ=VW3020, SV������ַ=VW3030
-// PV������Ϣ: 2040,2041,2045,2047,2051
-// SV������Ϣ: 2060,2061,2065,2067,2071
+Network 3 // 网络标题
+// 2	VW3020		VW3030		WEST（变频器）
+// West表地址=2,PV变量地址=VW3020, SV变量地址=VW3030
+// PV定义信息: 2040,2041,2045,2047,2051
+// SV定义信息: 2060,2061,2065,2067,2071
 LD     SM0.0
 MOVB   2, VB2040
 MOVD   44097, VD2041
@@ -621,11 +621,11 @@ MOVD   44098, VD2061
 MOVW   1, VW2065
 MOVD   &VB3030, VD2067
 MOVB   1, VB2071
-Network 4 // �������
-// 3	VW3040		VW3050		WEST����Ԥ�ȸ��¶ȣ�
-// West����ַ=3,PV������ַ=VW3040, SV������ַ=VW3050
-// PV������Ϣ: 2080,2081,2085,2087,2091
-// SV������Ϣ: 2100,2101,2105,2107,2111
+Network 4 // 网络标题
+// 3	VW3040		VW3050		WEST表（预热釜温度）
+// West表地址=3,PV变量地址=VW3040, SV变量地址=VW3050
+// PV定义信息: 2080,2081,2085,2087,2091
+// SV定义信息: 2100,2101,2105,2107,2111
 LD     SM0.0
 MOVB   3, VB2080
 MOVD   44097, VD2081
@@ -637,11 +637,11 @@ MOVD   44098, VD2101
 MOVW   1, VW2105
 MOVD   &VB3050, VD2107
 MOVB   2, VB2111
-Network 5 // �������
-// 4	VW3060		VW3070		WEST�������ȴ��¶ȣ�
-// West����ַ=4,PV������ַ=VW3060, SV������ַ=VW3070
-// PV������Ϣ: 2120,2121,2125,2127,2131
-// SV������Ϣ: 2140,2141,2145,2147,2151
+Network 5 // 网络标题
+// 4	VW3060		VW3070		WEST表（伴热带温度）
+// West表地址=4,PV变量地址=VW3060, SV变量地址=VW3070
+// PV定义信息: 2120,2121,2125,2127,2131
+// SV定义信息: 2140,2141,2145,2147,2151
 LD     SM0.0
 MOVB   4, VB2120
 MOVD   44097, VD2121
@@ -653,11 +653,11 @@ MOVD   44098, VD2141
 MOVW   1, VW2145
 MOVD   &VB3070, VD2147
 MOVB   3, VB2151
-Network 6 // �������
-// 5	VW3080		VW3090		WEST������ʽ��Ӧ��3�μ��ȣ�
-// West����ַ=5,PV������ַ=VW3080, SV������ַ=VW3090
-// PV������Ϣ: 2160,2161,2165,2167,2171
-// SV������Ϣ: 2180,2181,2185,2187,2191
+Network 6 // 网络标题
+// 5	VW3080		VW3090		WEST表（管式反应器3段加热）
+// West表地址=5,PV变量地址=VW3080, SV变量地址=VW3090
+// PV定义信息: 2160,2161,2165,2167,2171
+// SV定义信息: 2180,2181,2185,2187,2191
 LD     SM0.0
 MOVB   5, VB2160
 MOVD   44097, VD2161
@@ -669,11 +669,11 @@ MOVD   44098, VD2181
 MOVW   1, VW2185
 MOVD   &VB3090, VD2187
 MOVB   4, VB2191
-Network 7 // �������
-// 6	VW3100		VW3110		WEST������ʽ��Ӧ��3�μ��ȣ�
-// West����ַ=6,PV������ַ=VW3100, SV������ַ=VW3110
-// PV������Ϣ: 2200,2201,2205,2207,2211
-// SV������Ϣ: 2220,2221,2225,2227,2231
+Network 7 // 网络标题
+// 6	VW3100		VW3110		WEST表（管式反应器3段加热）
+// West表地址=6,PV变量地址=VW3100, SV变量地址=VW3110
+// PV定义信息: 2200,2201,2205,2207,2211
+// SV定义信息: 2220,2221,2225,2227,2231
 LD     SM0.0
 MOVB   6, VB2200
 MOVD   44097, VD2201
@@ -685,11 +685,11 @@ MOVD   44098, VD2221
 MOVW   1, VW2225
 MOVD   &VB3110, VD2227
 MOVB   5, VB2231
-Network 8 // �������
-// 7	VW3120		VW3130		WEST������ʽ��Ӧ��3�μ��ȣ�
-// West����ַ=7,PV������ַ=VW3120, SV������ַ=VW3130
-// PV������Ϣ: 2240,2241,2245,2247,2251
-// SV������Ϣ: 2260,2261,2265,2267,2271
+Network 8 // 网络标题
+// 7	VW3120		VW3130		WEST表（管式反应器3段加热）
+// West表地址=7,PV变量地址=VW3120, SV变量地址=VW3130
+// PV定义信息: 2240,2241,2245,2247,2251
+// SV定义信息: 2260,2261,2265,2267,2271
 LD     SM0.0
 MOVB   7, VB2240
 MOVD   44097, VD2241
@@ -701,11 +701,11 @@ MOVD   44098, VD2261
 MOVW   1, VW2265
 MOVD   &VB3130, VD2267
 MOVB   6, VB2271
-Network 9 // �������
-// 8	VW3140		VW3150		WEST������ʽ��Ӧ���ڲ��¶ȣ�
-// West����ַ=8,PV������ַ=VW3140, SV������ַ=VW3150
-// PV������Ϣ: 2280,2281,2285,2287,2291
-// SV������Ϣ: 2300,2301,2305,2307,2311
+Network 9 // 网络标题
+// 8	VW3140		VW3150		WEST表（管式反应器内部温度）
+// West表地址=8,PV变量地址=VW3140, SV变量地址=VW3150
+// PV定义信息: 2280,2281,2285,2287,2291
+// SV定义信息: 2300,2301,2305,2307,2311
 LD     SM0.0
 MOVB   8, VB2280
 MOVD   44097, VD2281
@@ -717,11 +717,11 @@ MOVD   44098, VD2301
 MOVW   1, VW2305
 MOVD   &VB3150, VD2307
 MOVB   7, VB2311
-Network 10 // �������
-// 9	VW3160		VW3170		WEST����Һ�������¶Ȱ��ȣ�
-// West����ַ=9,PV������ַ=VW3160, SV������ַ=VW3170
-// PV������Ϣ: 2320,2321,2325,2327,2331
-// SV������Ϣ: 2340,2341,2345,2347,2351
+Network 10 // 网络标题
+// 9	VW3160		VW3170		WEST（气液分离器温度伴热）
+// West表地址=9,PV变量地址=VW3160, SV变量地址=VW3170
+// PV定义信息: 2320,2321,2325,2327,2331
+// SV定义信息: 2340,2341,2345,2347,2351
 LD     SM0.0
 MOVB   9, VB2320
 MOVD   44097, VD2321
@@ -733,11 +733,11 @@ MOVD   44098, VD2341
 MOVW   1, VW2345
 MOVD   &VB3170, VD2347
 MOVB   8, VB2351
-Network 11 // �������
-// 10	VW3180		VW3190		WEST��ѹ����������
-// West����ַ=10,PV������ַ=VW3180, SV������ַ=VW3190
-// PV������Ϣ: 2360,2361,2365,2367,2371
-// SV������Ϣ: 2380,2381,2385,2387,2391
+Network 11 // 网络标题
+// 10	VW3180		VW3190		WEST（压力传感器）
+// West表地址=10,PV变量地址=VW3180, SV变量地址=VW3190
+// PV定义信息: 2360,2361,2365,2367,2371
+// SV定义信息: 2380,2381,2385,2387,2391
 LD     SM0.0
 MOVB   10, VB2360
 MOVD   44097, VD2361
@@ -749,11 +749,11 @@ MOVD   44098, VD2381
 MOVW   1, VW2385
 MOVD   &VB3190, VD2387
 MOVB   9, VB2391
-Network 12 // �������
-// 11	VW3200		VW3210		WEST��ѹ����������
-// West����ַ=11,PV������ַ=VW3200, SV������ַ=VW3210
-// PV������Ϣ: 2400,2401,2405,2407,2411
-// SV������Ϣ: 2420,2421,2425,2427,2431
+Network 12 // 网络标题
+// 11	VW3200		VW3210		WEST（压力传感器）
+// West表地址=11,PV变量地址=VW3200, SV变量地址=VW3210
+// PV定义信息: 2400,2401,2405,2407,2411
+// SV定义信息: 2420,2421,2425,2427,2431
 LD     SM0.0
 MOVB   11, VB2400
 MOVD   44097, VD2401
@@ -769,35 +769,35 @@ END_SUBROUTINE_BLOCK
 SUBROUTINE_BLOCK HSC_INIT3:SBR5
 TITLE=
 BEGIN
-Network 1 // HSC ָ����
-// Ҫ�ڳ�����ʹ�ô����ã��������������ʹ�� SM0.1 ��һ���ش���ָ�����һ�δ��ӳ���
-// ���� HC3 Ϊģʽ 0��CV = 0�� PV = 0����������
-// �����жϺ�������������
+Network 1 // HSC 指令向导
+// 要在程序中使用此配置，请在主程序块中使用 SM0.1 或一条沿触发指令调用一次此子程序。
+// 配置 HC3 为模式 0；CV = 0； PV = 0；增计数；
+// 开放中断和启动计数器。
 // 
 LD     SM0.0
-MOVB   16#F8, SMB147               //���ÿ���λ������������ʹ�ܣ�
-MOVD   +0, SMD148                  //װ�� CV
-MOVD   +0, SMD152                  //װ�� PV
+MOVB   16#F8, SMB147               //设置控制位：增计数；已使能；
+MOVD   +0, SMD148                  //装载 CV
+MOVD   +0, SMD152                  //装载 PV
 HDEF   4, 0
 ENI
 HSC    4
 END_SUBROUTINE_BLOCK
 SUBROUTINE_BLOCK SELECT_TAG:SBR6
-TITLE=���ܣ��ӱ����б���ѡ��������ж�/д������
+TITLE=功能：从变量列表中选择变量进行读/写操作。
 // 
-// ���̣�	����������ѭ��������ÿ����������ִ�����в���
+// 过程：	按变量个数循环，对于每个变量，都执行下列步骤
 // 	
-// 	1. �����αָ꣬����һ�������������ת��
-// 	2. �жϱ����������豸״̬���豸����ת����3���豸������ת����4
-// 	3. �жϱ����Ƿ���Ҫд����Ҫд�������÷���ֵΪ3��ת����5������Ҫд�������÷���ֵΪ1ת����5
-// 	4. �ж��豸ͨѶ����Ƿ����5�룬�����÷���ֵ2��ת����5������ת����1.
-// 	5. ��ɣ�����ѭ��
+// 	1. 调整游标，指向下一个变量（最大则翻转）
+// 	2. 判断变量所属的设备状态，设备正常转步骤3，设备不正常转步骤4
+// 	3. 判断变量是否需要写，需要写，则设置返回值为3，转步骤5，不需要写，则设置返回值为1转步骤5
+// 	4. 判断设备通讯间隔是否大于5秒，是设置返回值2，转步骤5，否则转步骤1.
+// 	5. 完成，跳出循环
 // 	
-// ����ֵ��
-// 	3 ������Ҫд��
-// 	2 ������Ҫ���Զ�ȡ
-// 	1 ������Ҫ��ȡ
-// 	0 ��ȡ������Ϣʧ��
+// 返回值：
+// 	3 变量需要写入
+// 	2 变量需要尝试读取
+// 	1 变量需要读取
+// 	0 获取变量信息失败
 VAR_OUTPUT
 num:WORD;
 END_VAR
@@ -806,8 +806,8 @@ saveac0:DWORD;
 saveac1:DWORD;
 saveac2:DWORD;
 saveac3:DWORD;
-startaddr:DWORD;	// ������Ϣ���׵�ַ
-sn_ptr:DWORD;	// ������Ӧ���豸��˳��ŵĵ�ַ
+startaddr:DWORD;	// 变量信息的首地址
+sn_ptr:DWORD;	// 变量对应的设备的顺序号的地址
 last_timestamp_ptr:DWORD;
 time_gone:DWORD;
 i:WORD;
@@ -820,23 +820,23 @@ map:DWORD;
 bitinfo:DWORD;
 END_VAR
 BEGIN
-Network 1 // �������
-// ����AC�Ĵ���
+Network 1 // 网络标题
+// 保存AC寄存器
 LD     SM0.0
 MOVD   AC0, LD2
 MOVD   AC1, LD6
 MOVD   AC2, LD10
 MOVD   AC3, LD14
 Network 2 
-// ��ʼ������ֵ
+// 初始化返回值
 LD     SM0.0
 MOVW   0, LW0
 Network 3 
-// ѭ����ʼ������������ѭ����
+// 循环开始（按变量个数循环）
 LD     SM0.0
 FOR    LW34, 1, 22
 Network 4 
-// ������ȡ����������
+// 调整读取变量的索引
 // {
 // 	pos = pos +1;
 // 	if(pos >= max_tag_num)
@@ -850,7 +850,7 @@ INCD   VD1000
 AD>=   VD1000, 22
 MOVD   0, VD1000
 Network 5 
-// ��������δʹ�õı���ַ
+// 跳过本次未使用的表地址
 LD     SM0.0
 LDD=   VD1000, 2
 OD=    VD1000, 3
@@ -859,15 +859,15 @@ OD=    VD1000, 5
 ALD
 JMP    212
 Network 6 
-// ��ȡ������Ϣ���׵�ַ
+// 获取变量信息的首地址
 LD     SM0.0
 MOVD   VD1000, AC0
 *D     +20, AC0
 MOVD   VD1004, LD18
 +D     AC0, LD18
 Network 7 
-// �ж��豸״̬
-// 	�豸״̬���������ȡ����
+// 判断设备状态
+// 	设备状态正常，则读取数据
 LD     SM0.0
 MOVD   LD18, LD22
 +D     +11, LD22
@@ -875,12 +875,12 @@ MOVD   1, AC1
 SLD    AC1, *LD22
 ANDD   *VD1016, AC1
 Network 8 
-// �豸ͨѶ״̬����������ѭ��
+// 设备通讯状态正常，跳出循环
 LD     SM0.0
 AD=    AC1, 0
 JMP    200
 Network 9 
-// ���豸ͨѶ������ʱ������ϴζ�ȡʱ��
+// 当设备通讯不正常时，检查上次读取时间
 // 	
 LD     SM0.0
 MOVD   0, AC0
@@ -890,7 +890,7 @@ MOVD   VD1020, LD26
 +D     AC0, LD26
 CITIM  *LD26, LD30
 Network 10 
-// ����豸״̬��������������豸���ϴζ�ȡʱ�䣬���ζ�ȡ��ʱ��������5�����ȡ�������������������
+// 如果设备状态不正常，则检查此设备的上次读取时间，两次读取的时间间隔大于5秒则读取，否则跳过这个变量。
 LD     SM0.0
 AD>    LD30, 5000
 JMP    210
@@ -899,18 +899,18 @@ LBL    212
 Network 12 
 NEXT
 Network 13 
-// FORѭ����ɣ�û���ҵ���Ҫ��ȡ�ı���
-// 	����num=0
+// FOR循环完成，没有找到需要读取的变量
+// 	返回num=0
 LD     SM0.0
 MOVW   0, LW0
 JMP    255
 Network 14 
-// �豸״̬��������ת����
-// 	�ж��Ƿ���д����������У���ִ��д������ִ�ж���
+// 设备状态正常，跳转到此
+// 	判断是否有写出请求，如果有，则执行写，否则执行读。
 LBL    200
 Network 15 
-// �������Ƿ��ȡ��,��־λΪ1��ʾ��ȡ��������û�ж�ȡ��
-// û�ж�ȡ���ı������������һ�ζ�ȡ
+// 检查变量是否读取过,标志位为1表示读取过，否则没有读取过
+// 没有读取过的变量，必须进行一次读取
 LD     SM0.0
 MOVD   LD18, LD56
 +D     +12, LD56
@@ -919,15 +919,15 @@ ANDB   1, AC0
 AB=    AC0, 0
 JMP    202
 Network 16 
-// �����Ѿ���ȡ�����ж����Ƿ���Ҫд
+// 变量已经读取过，判断其是否需要写
 // 
-// ��ȡ�����ļĴ�������
+// 获取变量的寄存器个数
 LD     SM0.0
 MOVD   LD18, AC1
 +D     +5, AC1
 MOVW   *AC1, LW46
 Network 17 
-// ��ȡ���ݴ洢��ַ
+// 获取数据存储地址
 LD     SM0.0
 MOVD   LD18, AC2
 +D     +7, AC2
@@ -949,8 +949,8 @@ JMP    201
 Network 21 
 NEXT
 Network 22 
-// ûҪ������Ҫд����ִ�ж�ȡ������ֵ1
-// ����δ��ȡ������ִ�ж�ȡ������ֵ1
+// 没要变量需要写，则执行读取，返回值1
+// 变量未读取过，则执行读取，返回值1
 LBL    202
 Network 23 
 LD     SM0.0
@@ -958,7 +958,7 @@ MOVW   1, LW0
 BMB    *LD18, *VD1012, 20
 JMP    255
 Network 24 
-// �б�����Ҫд������ֵ3
+// 有变量需要写，返回值3
 LBL    201
 Network 25 
 LD     SM0.0
@@ -966,7 +966,7 @@ MOVW   3, LW0
 BMB    *LD18, *VD1012, 20
 JMP    255
 Network 26 
-// �б�����Ҫ���Զ�ȡ������ֵ2
+// 有变量需要尝试读取，返回值2
 LBL    210
 Network 27 
 LD     SM0.0
@@ -974,13 +974,13 @@ MOVW   2, LW0
 BMB    *LD18, *VD1012, 20
 JMP    255
 Network 28 
-// ������ת����ֹ©��
+// 绝对跳转，防止漏掉
 LD     SM0.0
 JMP    255
 Network 29 
 LBL    255
 Network 30 
-// �ָ�AC�Ĵ���
+// 恢复AC寄存器
 LD     SM0.0
 MOVD   LD2, AC0
 MOVD   LD6, AC1
@@ -988,25 +988,25 @@ MOVD   LD10, AC2
 MOVD   LD14, AC3
 END_SUBROUTINE_BLOCK
 SUBROUTINE_BLOCK INIT_DEV_STATE:SBR7
-TITLE=�ӳ���ע��
+TITLE=子程序注释
 VAR
 i:WORD;
 pos:DWORD;
 END_VAR
 BEGIN
 Network 1 
-// ѭ����ʼ������������ѭ����
+// 循环开始（按变量个数循环）
 LD     SM0.0
 FOR    LW0, 1, 22
-Network 2 // �������
-// ����ע��
+Network 2 // 网络标题
+// 网络注释
 LD     SM0.0
 CALL   SBR0, 1, LD2
 Network 3 
 NEXT
 END_SUBROUTINE_BLOCK
 SUBROUTINE_BLOCK UPDATE_TAG_INFO:SBR8
-TITLE=�ӳ���ע��
+TITLE=子程序注释
 VAR_INPUT
 bit:BYTE;
 value:BYTE;
@@ -1023,8 +1023,8 @@ max_i:WORD;
 bitinfo:DWORD;
 END_VAR
 BEGIN
-Network 1 // �������
-// ����AC�Ĵ���
+Network 1 // 网络标题
+// 保存AC寄存器
 LD     SM0.0
 MOVD   AC0, LD3
 MOVD   AC1, LD7
@@ -1034,11 +1034,11 @@ Network 2
 LD     SM0.0
 MOVW   0, LW19
 Network 3 
-// ѭ����ʼ������������ѭ����
+// 循环开始（按变量个数循环）
 LD     SM0.0
 FOR    LW25, 1, 22
 Network 4 
-// ��ȡ������Ϣ���׵�ַ
+// 获取变量信息的首地址
 LD     SM0.0
 MOVD   0, AC0
 MOVW   LW19, AC0
@@ -1046,12 +1046,12 @@ MOVW   LW19, AC0
 MOVD   VD1004, LD21
 +D     AC0, LD21
 Network 5 
-// վ�Ų���ȣ���continue��������һ��ѭ��
+// 站号不相等，则continue，继续下一次循环
 LD     SM0.0
 AB<>   *LD21, LB2
 JMP    100
-Network 6 // �������
-// վ����ȣ�����±�����Ϣ
+Network 6 // 网络标题
+// 站号相等，则更新变量信息
 LD     SM0.0
 LPS
 MOVD   LD21, LD27
@@ -1071,7 +1071,7 @@ NEXT
 Network 10 
 LBL    255
 Network 11 
-// �ָ�AC�Ĵ���
+// 恢复AC寄存器
 LD     SM0.0
 MOVD   LD3, AC0
 MOVD   LD7, AC1
@@ -1081,28 +1081,28 @@ END_SUBROUTINE_BLOCK
 SUBROUTINE_BLOCK HSC0_INIT:SBR9
 TITLE=
 BEGIN
-Network 1 // HSC ָ����
-// Ҫ�ڳ�����ʹ�ô����ã��������������ʹ�� SM0.1 ��һ���ش���ָ�����һ�δ��ӳ���
-// ���� HC0 Ϊģʽ 0��CV = 0�� PV = 0����������
-// �����жϺ�������������
+Network 1 // HSC 指令向导
+// 要在程序中使用此配置，请在主程序块中使用 SM0.1 或一条沿触发指令调用一次此子程序。
+// 配置 HC0 为模式 0；CV = 0； PV = 0；增计数；
+// 开放中断和启动计数器。
 // 
 LD     SM0.0
-MOVB   16#F8, SMB37                //���ÿ���λ������������ʹ�ܣ�
-MOVD   +0, SMD38                   //װ�� CV
-MOVD   +0, SMD42                   //װ�� PV
+MOVB   16#F8, SMB37                //设置控制位：增计数；已使能；
+MOVD   +0, SMD38                   //装载 CV
+MOVD   +0, SMD42                   //装载 PV
 HDEF   0, 0
 ENI
 HSC    0
 END_SUBROUTINE_BLOCK
 INTERRUPT_BLOCK INT_0:INT0
-TITLE=�жϳ���ע��
+TITLE=中断程序注释
 BEGIN
-Network 1 // �������
-// ����ע��
+Network 1 // 网络标题
+// 网络注释
 END_INTERRUPT_BLOCK
 INTERRUPT_BLOCK MBUSM2:INT1
-TITLE=���������������Դ���Զ�����˾ר�У������ڸ�����������Modbus ��վ�˿� 0 �⡱��һ���֡�
+TITLE=本代码归西门子能源与自动化公司专有，它属于附加软件包“Modbus 主站端口 0 库”的一部分。
 BEGIN
-Network 1 // �� POU �����뱣�������ܱ༭�Ͳ鿴��
+Network 1 // 此 POU 受密码保护，不能编辑和查看。
 
 END_INTERRUPT_BLOCK
