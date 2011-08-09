@@ -1,1 +1,3 @@
 ﻿1.先到MicroWin目录下注册西门子的com组件reg.cmd，右键以管理员权限执行
+
+结构是Irony是第三方库，libnodave中我增加了下载的部分，libnodaveNET是包装，STLCompiler是编译awl到二进制。其中用到西门子的blockbuilder.dll和Signature200，前者负责编译ast到二进制，后者是西门子stl的指令信息。testS7-200是测试程序
