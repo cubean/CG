@@ -268,7 +268,7 @@ namespace ExportSig
                 UsageAndExit();
 
             using (TextReader streamReader =
-                new StreamReader(f, Encoding.Default))
+                new StreamReader(f))
             {
                 var source = streamReader.ReadToEnd();
 
@@ -337,7 +337,7 @@ namespace ExportSig
             compiler.DisassemblyBlock(block, out awlContent);
 
             using (var streamWriter =
-                new StreamWriter(o, false, Encoding.Default))
+                new StreamWriter(o, false))
             {
                 streamWriter.Write(awlContent);
             }
